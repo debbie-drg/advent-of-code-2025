@@ -22,7 +22,7 @@ fn do_rotations(input: &str, count_all: bool) -> Option<i64> {
             'R' => next_value = value + move_number,
             _ => next_value = value - move_number,
         }
-        let remainder = next_value.abs().rem_euclid(100);
+        let remainder = next_value.rem_euclid(100);
         if count_all {
             count_zeros += next_value.abs().div_euclid(100);
             if value != 0 && next_value <= 0 {
@@ -32,7 +32,7 @@ fn do_rotations(input: &str, count_all: bool) -> Option<i64> {
         else {
             if remainder == 0 {count_zeros += 1}
         }
-        value = next_value.rem_euclid(100);
+        value = remainder;
     }
     Some(count_zeros)
 }
