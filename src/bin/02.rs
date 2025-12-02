@@ -1,5 +1,3 @@
-use advent_of_code::template::commands::all;
-
 advent_of_code::solution!(2);
 
 fn parse_ranges(input: &str) -> Vec<(u64, u64)> {
