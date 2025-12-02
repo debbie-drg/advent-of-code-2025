@@ -1,3 +1,5 @@
+use std::ops::RangeInclusive;
+
 advent_of_code::solution!(2);
 
 fn parse_ranges(input: &str) -> Vec<(u64, u64)> {
@@ -13,19 +15,19 @@ fn parse_ranges(input: &str) -> Vec<(u64, u64)> {
         .collect()
 }
 
-fn is_valid_half(id: &str) -> bool {
-    if id.len() % 2 != 0 {
-        return false;
-    };
-    let half_len = id.len().div_euclid(2);
-    let (first_half, second_half) = id.split_at(half_len);
-    return first_half == second_half;
-}
-
-fn is_valid_all_lengths(id: &str) -> bool {
+fn is_valid(id: &str, all_lengths: bool) -> bool {
     let as_bytes = id.as_bytes();
     let max_len = as_bytes.len().div_euclid(2);
-    for chunk_size in 1..=max_len {
+    let chunk_sizes: RangeInclusive<usize>;
+    if all_lengths {
+        chunk_sizes = 1..=max_len;
+    } else {
+        if as_bytes.len().rem_euclid(2) != 0 {
+            return false;
+        };
+        chunk_sizes = max_len..=max_len;
+    }
+    for chunk_size in chunk_sizes {
         if as_bytes.len() % chunk_size == 0 {
             let first = &as_bytes[..chunk_size];
             if as_bytes.chunks(chunk_size).all(|chunk| chunk == first) {
@@ -34,13 +36,6 @@ fn is_valid_all_lengths(id: &str) -> bool {
         }
     }
     false
-}
-
-fn is_valid(id: &str, all_lengths: bool) -> bool {
-    if all_lengths {
-        return is_valid_all_lengths(id);
-    }
-    is_valid_half(id)
 }
 
 fn count_valid(range: (u64, u64), all_lengths: bool) -> u64 {
