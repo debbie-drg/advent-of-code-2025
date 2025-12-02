@@ -48,24 +48,23 @@ fn count_valid(range: (u64, u64), all_lengths: bool) -> u64 {
     count
 }
 
-pub fn part_one(input: &str) -> Option<u64> {
+fn count_all_valid(input: &str, all_lengths: bool) -> Option<u64> {
     let parsed_ranges = parse_ranges(input);
     Some(
         parsed_ranges
             .into_iter()
-            .map(|range| count_valid(range, false))
+            .map(|range| count_valid(range, all_lengths))
             .sum(),
     )
 }
 
+pub fn part_one(input: &str) -> Option<u64> {
+    count_all_valid(input, false)
+}
+
 pub fn part_two(input: &str) -> Option<u64> {
-    let parsed_ranges = parse_ranges(input);
-    Some(
-        parsed_ranges
-            .into_iter()
-            .map(|range| count_valid(range, true))
-            .sum(),
-    )
+    count_all_valid(input, true)
+
 }
 
 #[cfg(test)]
