@@ -30,7 +30,7 @@ fn do_rotations(input: &str, count_all: bool) -> Option<i64> {
             _ => next_value = value - move_number,
         }
         let remainder = next_value.rem_euclid(100);
-        part_2 += next_value.abs().div_euclid(100);
+        part_2 += next_value.abs() / 100;
         if value != 0 && next_value <= 0 {
             part_2 += 1
         }

@@ -17,12 +17,12 @@ fn parse_ranges(input: &str) -> Vec<(u64, u64)> {
 
 fn is_valid(id: &str, all_lengths: bool) -> bool {
     let as_bytes = id.as_bytes();
-    let max_len = as_bytes.len().div_euclid(2);
+    let max_len = as_bytes.len() / 2;
     let chunk_sizes: RangeInclusive<usize>;
     if all_lengths {
         chunk_sizes = 1..=max_len;
     } else {
-        if as_bytes.len().rem_euclid(2) != 0 {
+        if as_bytes.len() % 2 != 0 {
             return false;
         };
         chunk_sizes = max_len..=max_len;
