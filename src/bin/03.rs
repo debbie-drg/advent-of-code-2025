@@ -1,3 +1,4 @@
+use std::cmp::Reverse;
 advent_of_code::solution!(3);
 
 fn parse_string_to_numbers(input: &str) -> Vec<u64> {
@@ -21,19 +22,14 @@ fn compute_max_joltage(input: &Vec<u64>, length: usize) -> u64 {
     let mut joltage: u64 = 0;
     let mut position = 0;
     for digit_counter in (0..length).rev() {
-        let mut best: (usize, u64) = (0, 0);
-        for (i, &value) in input[position..input.len() - digit_counter]
+        let (max_position, max_value) = input[position..input.len() - digit_counter]
             .iter()
             .enumerate()
-        {
-            match best {
-                (_, max_val) if value > max_val => best = (i, value),
-                _ => {} // ignore equal values, keeps the first
-            }
-        }
+            .min_by_key(|&(_, value)| Reverse(value))
+            .unwrap();
 
-        position += best.0 + 1;
-        joltage += (10 as u64).pow(digit_counter as u32) * best.1;
+        position += max_position + 1;
+        joltage += (10 as u64).pow(digit_counter as u32) * max_value;
     }
     joltage
 }
