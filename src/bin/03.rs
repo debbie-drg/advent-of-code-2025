@@ -21,15 +21,13 @@ fn compute_max_joltage(input: &Vec<u64>, length: usize) -> u64 {
     let mut joltage: u64 = 0;
     let mut position = 0;
     for digit_counter in (0..length).rev() {
-        let remaining_digits: Vec<&u64> = input[position..].iter().collect();
-
         let mut best: (usize, u64) = (0, 0);
-        for (i, &value) in remaining_digits[..remaining_digits.len() - digit_counter]
+        for (i, &value) in input[position..input.len() - digit_counter]
             .iter()
             .enumerate()
         {
             match best {
-                (_, max_val) if *value > max_val => best = (i, *value),
+                (_, max_val) if value > max_val => best = (i, value),
                 _ => {} // ignore equal values, keeps the first
             }
         }
