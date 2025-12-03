@@ -30,7 +30,7 @@ fn compute_max_joltage(input: &Vec<u64>, length: usize) -> u64 {
         {
             match best {
                 (_, max_val) if *value > max_val => best = (i, *value),
-                _ => {} // ignore equal values — keeps the FIRST
+                _ => {} // ignore equal values, keeps the first
             }
         }
 
