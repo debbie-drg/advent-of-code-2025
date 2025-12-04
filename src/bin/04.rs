@@ -52,7 +52,7 @@ fn forklift_accessible(input: &str, remove: bool) -> Option<u64> {
         let accessible_list: Vec<(i64, i64)> = rolls_map
             .iter()
             .filter(|position| is_forklift_accessible(**position, &rolls_map))
-            .map(|position| position.clone())
+            .copied()
             .collect();
         let accessible_now = accessible_list.len();
         accessible += accessible_now as u64;
