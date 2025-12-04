@@ -37,7 +37,7 @@ fn roll_positions(input: &str) -> HashSet<(i64, i64)> {
     positions
 }
 
-fn forklift_accessible(position: (i64, i64), rolls: &HashSet<(i64, i64)>) -> bool {
+fn is_forklift_accessible(position: (i64, i64), rolls: &HashSet<(i64, i64)>) -> bool {
     neighbours(position)
         .iter()
         .filter(|neighbour| rolls.contains(neighbour))
@@ -45,34 +45,32 @@ fn forklift_accessible(position: (i64, i64), rolls: &HashSet<(i64, i64)>) -> boo
         < 4
 }
 
-pub fn part_one(input: &str) -> Option<u64> {
-    let rolls_map = roll_positions(input);
-    Some(
-        rolls_map
-            .iter()
-            .filter(|position| forklift_accessible(**position, &rolls_map))
-            .count() as u64,
-    )
-}
-
-pub fn part_two(input: &str) -> Option<u64> {
+fn forklift_accessible(input: &str, remove: bool) -> Option<u64> {
     let mut rolls_map = roll_positions(input);
     let mut accessible = 0;
     loop {
         let accessible_list: Vec<(i64, i64)> = rolls_map
             .iter()
-            .filter(|position| forklift_accessible(**position, &rolls_map))
+            .filter(|position| is_forklift_accessible(**position, &rolls_map))
             .map(|position| position.clone())
             .collect();
         let accessible_now = accessible_list.len();
-        if accessible_now == 0 {
-            return Some(accessible);
-        }
         accessible += accessible_now as u64;
+        if accessible_now == 0 || !remove {
+            return Some(accessible as u64);
+        }
         for position in accessible_list {
             rolls_map.remove(&position);
         }
     }
+}
+
+pub fn part_one(input: &str) -> Option<u64> {
+    forklift_accessible(input, false)
+}
+
+pub fn part_two(input: &str) -> Option<u64> {
+    forklift_accessible(input, true)
 }
 
 #[cfg(test)]
