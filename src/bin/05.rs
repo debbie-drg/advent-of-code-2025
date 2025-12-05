@@ -42,20 +42,20 @@ fn interval_intersection(interval_1: &(u64, u64), interval_2: &(u64, u64)) -> (u
 }
 
 fn merge_intervals(mut intervals: Vec<(u64, u64)>) -> Vec<(u64, u64)> {
-    let mut last_len = intervals.len();
+    intervals.sort();
+    let mut checked_until = 0;
     loop {
-        intervals.sort();
-        for index in 0..intervals.len() - 1 {
+        let mut changed = false;
+        for index in checked_until..intervals.len() - 1 {
             if intervals_intersect(&intervals[index], &intervals[index + 1]) {
                 intervals[index] = interval_intersection(&intervals[index], &intervals[index + 1]);
                 intervals.remove(index + 1);
+                checked_until = index;
+                changed = true;
                 break;
             }
         }
-        if intervals.len() == last_len {
-            return intervals;
-        }
-        last_len = intervals.len();
+        if !changed {return intervals;}
     }
 }
 
