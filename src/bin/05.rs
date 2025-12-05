@@ -1,6 +1,8 @@
 advent_of_code::solution!(5);
 
-use std::cmp::{max, min};
+use std::{
+    cmp::{max, min},
+};
 
 fn parse_fresh_intervals(input: &str) -> (Vec<(u64, u64)>, Vec<u64>) {
     let mut split_ingredients = input.split("\n\n");
@@ -43,20 +45,18 @@ fn interval_intersection(interval_1: &(u64, u64), interval_2: &(u64, u64)) -> (u
 
 fn merge_intervals(mut intervals: Vec<(u64, u64)>) -> Vec<(u64, u64)> {
     intervals.sort();
-    let mut checked_until = 0;
-    loop {
-        let mut changed = false;
-        for index in checked_until..intervals.len() - 1 {
-            if intervals_intersect(&intervals[index], &intervals[index + 1]) {
-                intervals[index] = interval_intersection(&intervals[index], &intervals[index + 1]);
-                intervals.remove(index + 1);
-                checked_until = index;
-                changed = true;
-                break;
-            }
+    let mut merged_intervals: Vec<(u64, u64)> = Vec::new();
+    let mut current_interval: (u64, u64) = intervals[0];
+    for interval in intervals {
+        if intervals_intersect(&interval, &current_interval) {
+            current_interval = interval_intersection(&interval, &current_interval)
+        } else {
+            merged_intervals.push(current_interval);
+            current_interval = interval;
         }
-        if !changed {return intervals;}
     }
+    merged_intervals.push(current_interval);
+    merged_intervals
 }
 
 pub fn part_one(input: &str) -> Option<u64> {
