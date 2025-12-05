@@ -60,7 +60,8 @@ fn merge_intervals(mut intervals: Vec<(u64, u64)>) -> Vec<(u64, u64)> {
 }
 
 pub fn part_one(input: &str) -> Option<u64> {
-    let (ingredient_intervals, ingredients) = parse_fresh_intervals(input);
+    let (mut ingredient_intervals, ingredients) = parse_fresh_intervals(input);
+    ingredient_intervals = merge_intervals(ingredient_intervals);
     Some(
         ingredients
             .into_iter()
