@@ -9,7 +9,7 @@ fn parse_instruction(s: &str) -> Option<(char, i64)> {
 }
 
 fn parse_all_instructions(input: &str) -> Vec<(char, i64)> {
-    let input_lines: std::str::Split<'_, &str> = input.split("\n");
+    let input_lines: std::str::Split<'_, &str> = input.trim().split("\n");
     input_lines
         .into_iter()
         .map(|instruction| parse_instruction(instruction))

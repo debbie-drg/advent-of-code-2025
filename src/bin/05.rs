@@ -5,12 +5,11 @@ use std::{
 };
 
 fn parse_fresh_intervals(input: &str) -> (Vec<(u64, u64)>, Vec<u64>) {
-    let mut split_ingredients = input.split("\n\n");
+    let mut split_ingredients = input.trim().split("\n\n");
     let fresh_intervals = split_ingredients.next().unwrap();
     let ingredients = split_ingredients.next().unwrap();
     let ingredient_intervals: Vec<(u64, u64)> = fresh_intervals
         .split("\n")
-        .filter(|s| s.len() > 0)
         .map(|range| {
             let mut parts = range.split('-');
             let start = parts.next().unwrap().parse::<u64>().unwrap();
