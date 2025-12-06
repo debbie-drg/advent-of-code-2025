@@ -10,11 +10,7 @@ fn split_numbers_operands(input: &str) -> (&str, Vec<char>) {
 
 fn operate(operand: char, numbers: Vec<u64>) -> u64 {
     match operand {
-        '*' => numbers
-            .iter()
-            .copied()
-            .reduce(|num_1, num_2| num_1 * num_2)
-            .unwrap(),
+        '*' => numbers.iter().product(),
         '+' => numbers.iter().sum(),
         _ => panic!("Impossible operand"),
     }
@@ -59,11 +55,13 @@ pub fn part_one(input: &str) -> Option<u64> {
 
 pub fn part_two(input: &str) -> Option<u64> {
     let (numbers_text, operands) = split_numbers_operands(input);
-    let split_numbers: Vec<Vec<char>> = transpose(numbers_text
-        .split("\n")
-        .into_iter()
-        .map(|line| line.chars().collect())
-        .collect());
+    let split_numbers: Vec<Vec<char>> = transpose(
+        numbers_text
+            .split("\n")
+            .into_iter()
+            .map(|line| line.chars().collect())
+            .collect(),
+    );
     let mut numbers_list: Vec<Vec<u64>> = Vec::new();
     let mut current_numbers: Vec<u64> = Vec::new();
 
