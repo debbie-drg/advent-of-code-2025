@@ -2,6 +2,12 @@ use std::iter::zip;
 
 advent_of_code::solution!(6);
 
+fn split_numbers_operands(input: &str) -> (&str, Vec<char>) {
+    let (numbers_text, operands) = input.trim().rsplit_once("\n").unwrap();
+    let operands = operands.chars().filter(|char| char != &' ').collect();
+    (numbers_text, operands)
+}
+
 fn operate(operand: char, numbers: Vec<u64>) -> u64 {
     match operand {
         '*' => numbers
@@ -35,58 +41,47 @@ where
 }
 
 pub fn part_one(input: &str) -> Option<u64> {
-    let (numbers_text, operands) = input.trim().rsplit_once("\n").unwrap();
-    let operands = operands.chars().filter(|char| char != &' ').collect();
-    let parsed_numbers: Vec<Vec<u64>> = numbers_text
-        .split("\n")
-        .into_iter()
-        .map(|line| {
-            line.trim()
-                .split_whitespace()
-                .map(|entry| entry.parse::<u64>().unwrap())
-                .collect()
-        })
-        .collect();
-    let parsed_numbers = transpose(parsed_numbers);
+    let (numbers_text, operands) = split_numbers_operands(input);
+    let parsed_numbers: Vec<Vec<u64>> = transpose(
+        numbers_text
+            .split("\n")
+            .into_iter()
+            .map(|line| {
+                line.trim()
+                    .split_whitespace()
+                    .map(|entry| entry.parse::<u64>().unwrap())
+                    .collect()
+            })
+            .collect(),
+    );
     Some(operate_all(operands, parsed_numbers))
 }
 
 pub fn part_two(input: &str) -> Option<u64> {
-    let (numbers_text, operands) = input.strip_suffix("\n").unwrap().rsplit_once("\n").unwrap();
-    let operand_chars: Vec<char> = operands.chars().collect();
-    let split_numbers: Vec<Vec<char>> = numbers_text
+    let (numbers_text, operands) = split_numbers_operands(input);
+    let split_numbers: Vec<Vec<char>> = transpose(numbers_text
         .split("\n")
         .into_iter()
         .map(|line| line.chars().collect())
-        .collect();
-    let mut operation_placements: Vec<usize> = operand_chars
-        .iter()
-        .enumerate()
-        .filter(|(_, char)| char != &&' ')
-        .map(|(index, _)| index)
-        .collect();
-    operation_placements.push(operand_chars.len() + 1);
-
+        .collect());
     let mut numbers_list: Vec<Vec<u64>> = Vec::new();
+    let mut current_numbers: Vec<u64> = Vec::new();
 
-    for operation_index in 0..operation_placements.len() - 1 {
-        let mut current_numbers: Vec<u64> = Vec::new();
-        for index in
-            operation_placements[operation_index]..operation_placements[operation_index + 1] - 1
-        {
-            let mut current_number: String = "".to_owned();
-            for number in &split_numbers {
-                current_number.push(number[index]);
-            }
-            current_numbers.push(current_number.trim().parse().unwrap());
+    for line in split_numbers {
+        let mut number_string = String::new();
+        for char in line.iter() {
+            number_string.push(*char);
         }
-        numbers_list.push(current_numbers);
+        match number_string.trim().parse::<u64>() {
+            Ok(number) => current_numbers.push(number),
+            Err(_) => {
+                numbers_list.push(current_numbers);
+                current_numbers = Vec::new();
+            }
+        }
     }
+    numbers_list.push(current_numbers);
 
-    let operands: Vec<char> = operand_chars
-        .into_iter()
-        .filter(|char| char != &' ')
-        .collect();
     Some(operate_all(operands, numbers_list))
 }
 
