@@ -54,7 +54,11 @@ pub fn part_one(input: &str) -> Option<u64> {
 pub fn part_two(input: &str) -> Option<u64> {
     let (numbers_text, operands) = input.strip_suffix("\n").unwrap().rsplit_once("\n").unwrap();
     let operand_chars: Vec<char> = operands.chars().collect();
-    let operands: Vec<char> = operand_chars.iter().copied().filter(|char| char != &' ').collect();
+    let operands: Vec<char> = operand_chars
+        .iter()
+        .copied()
+        .filter(|char| char != &' ')
+        .collect();
     let split_numbers: Vec<Vec<char>> = numbers_text
         .split("\n")
         .into_iter()
