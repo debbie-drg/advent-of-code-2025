@@ -18,52 +18,52 @@ fn parse_manifold(input: &str) -> (HashSet<(i64, i64)>, (i64, i64)) {
     (splitters, start)
 }
 
-fn next_beam_count(
-    splitters: &HashSet<(i64, i64)>,
-    position: (i64, i64),
-    memory: &mut HashMap<(i64, i64), i64>,
-    used_splitters: &mut HashSet<(i64, i64)>,
-) -> i64 {
-    if memory.contains_key(&position) {
-        return memory[&position];
-    }
-    let mut result: i64 = 0;
-    let mut split: bool = false;
-    let (hor_pos, ver_pos) = position;
-    for row in (0..hor_pos).rev() {
-        if splitters.contains(&(row, ver_pos)) {
-            used_splitters.insert((row, ver_pos));
-            result += next_beam_count(splitters, (row, ver_pos - 1), memory, used_splitters);
-            result += next_beam_count(splitters, (row, ver_pos + 1), memory, used_splitters);
-            split = true;
-            break;
+fn beam_count(splitters: &HashSet<(i64, i64)>, start_position: (i64, i64)) -> (i64, i64) {
+    let mut used_splitters: HashSet<(i64, i64)> = HashSet::new();
+    let mut current_beams: HashMap<i64, i64> = HashMap::new();
+    current_beams.insert(start_position.1, 1);
+    let mut next_beams: HashMap<i64, i64> = HashMap::new();
+    for row in (0..start_position.0).rev() {
+        for (col, beam_count) in current_beams.iter().into_iter() {
+            if splitters.contains(&(row, *col)) {
+                next_beams
+                    .entry(*col - 1)
+                    .and_modify(|count| *count += beam_count)
+                    .or_insert(*beam_count);
+                next_beams
+                    .entry(*col + 1)
+                    .and_modify(|count| *count += beam_count)
+                    .or_insert(*beam_count);
+                used_splitters.insert((row, *col));
+            } else {
+                next_beams
+                    .entry(*col)
+                    .and_modify(|count| *count += beam_count)
+                    .or_insert(*beam_count);
+            }
         }
+        current_beams = next_beams;
+        next_beams = HashMap::new();
     }
-    if !split {
-        result = 1
-    };
-    memory.insert(position, result);
-    return result;
+    let splitter_count = used_splitters.len() as i64;
+    let beam_count = current_beams
+        .iter()
+        .into_iter()
+        .map(|(_, value)| value)
+        .sum();
+    (splitter_count, beam_count)
 }
 
 pub fn part_one(input: &str) -> Option<i64> {
     let (splitters, start_position) = parse_manifold(input);
-    let mut memory: HashMap<(i64, i64), i64> = HashMap::new();
-    let mut used_splitters: HashSet<(i64, i64)> = HashSet::new();
-    _ = next_beam_count(&splitters, start_position, &mut memory, &mut used_splitters);
-    Some(used_splitters.len() as i64)
+    let (splitter_count, _) = beam_count(&splitters, start_position);
+    Some(splitter_count)
 }
 
 pub fn part_two(input: &str) -> Option<i64> {
     let (splitters, start_position) = parse_manifold(input);
-    let mut memory: HashMap<(i64, i64), i64> = HashMap::new();
-    let mut used_splitters: HashSet<(i64, i64)> = HashSet::new();
-    Some(next_beam_count(
-        &splitters,
-        start_position,
-        &mut memory,
-        &mut used_splitters,
-    ))
+    let (_, beam_count) = beam_count(&splitters, start_position);
+    Some(beam_count)
 }
 
 #[cfg(test)]
