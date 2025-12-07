@@ -6,7 +6,14 @@ fn parse_manifold(input: &str) -> (HashSet<(i64, i64)>, (i64, i64)) {
     let mut splitters = HashSet::new();
     let mut start: (i64, i64) = (0, 0);
     let split_input: Vec<&str> = input.trim().split("\n").into_iter().collect();
-    for (row, line) in split_input.iter().rev().enumerate() {
+    for (row, line) in split_input
+        .iter()
+        .enumerate()
+        .filter(|(index, _)| index % 2 == 0)
+        .map(|(_, line)| line)
+        .rev()
+        .enumerate()
+    {
         for (col, ch) in line.chars().enumerate() {
             if ch == '^' {
                 splitters.insert((row as i64, col as i64));
@@ -25,7 +32,7 @@ fn beam_count(splitters: &HashSet<(i64, i64)>, start_position: (i64, i64)) -> (i
     let mut next_beams: HashMap<i64, i64> = HashMap::new();
     for row in (0..start_position.0).rev() {
         for (col, beam_count) in current_beams.iter().into_iter() {
-            let offsets : Vec<i64>;
+            let offsets: Vec<i64>;
             if splitters.contains(&(row, *col)) {
                 offsets = vec![-1, 1];
                 used_splitters.insert((row, *col));
