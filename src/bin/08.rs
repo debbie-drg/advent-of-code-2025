@@ -61,7 +61,7 @@ fn connect_circuits(coordinates: Vec<Vec<i64>>, all_connections: bool) -> i64 {
     let number_connections: usize;
     if all_connections {
         number_connections = sorted_pairs.len();
-    } else if coordinates.len() <= 20 {
+    } else if coordinates.len() <= 20 { // Special case for the test
         number_connections = 10;
     } else {
         number_connections = 1000;
