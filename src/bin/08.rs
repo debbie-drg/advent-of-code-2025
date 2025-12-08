@@ -78,10 +78,10 @@ fn connect_circuits(coordinates: Vec<Vec<i64>>, all_connections: bool) -> i64 {
         for index in intersecting.iter().rev() {
             circuit.extend(&circuits.remove(*index));
         }
-        circuits.push(circuit);
-        if circuits[0].len() == coordinates.len() {
+        if circuit.len() == coordinates.len() { // reached part 2 condition
             return coordinates[*point_1][0] * coordinates[*point_2][0];
         }
+        circuits.push(circuit);
     }
     circuits.sort_by_key(|circuit| Reverse(circuit.len()));
     circuits[..3]
