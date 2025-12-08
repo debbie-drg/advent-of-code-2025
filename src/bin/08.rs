@@ -15,16 +15,16 @@ fn parse_coordinates(input: &str) -> Vec<Vec<i64>> {
         .collect()
 }
 
-fn euclidean_distance_sq(vector_1: &Vec<i64>, vector_2: &Vec<i64>) -> f64 {
-    let mut result: f64 = 0.0;
+fn euclidean_distance_sq(vector_1: &Vec<i64>, vector_2: &Vec<i64>) -> i64 {
+    let mut result: i64 = 0;
     for index in 0..vector_1.len() {
-        let diff = (vector_1[index] - vector_2[index]) as f64;
+        let diff = vector_1[index] - vector_2[index];
         result += diff * diff;
     }
     result // no need to compute root for comparisons
 }
 
-fn pair_distances(vectors: &Vec<Vec<i64>>) -> Vec<Vec<f64>> {
+fn pair_distances(vectors: &Vec<Vec<i64>>) -> Vec<Vec<i64>> {
     vectors
         .iter()
         .map(|vector_1| {
@@ -36,7 +36,7 @@ fn pair_distances(vectors: &Vec<Vec<i64>>) -> Vec<Vec<f64>> {
         .collect()
 }
 
-fn sort_pairs(distance_matrix: &Vec<Vec<f64>>) -> Vec<(usize, usize)> {
+fn sort_pairs(distance_matrix: &Vec<Vec<i64>>) -> Vec<(usize, usize)> {
     let number_elements = distance_matrix.len();
 
     let mut pairs: Vec<(usize, usize)> =
