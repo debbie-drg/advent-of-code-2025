@@ -81,14 +81,17 @@ fn get_border(coordinates: &Vec<(i64, i64)>) -> HashSet<(i64, i64)> {
     border
 }
 
-fn square_border(corner_1: (i64, i64), corner_2: (i64, i64)) -> HashSet<(i64, i64)> {
-    let corners = Vec::from([
+fn square_vertices(corner_1: (i64, i64), corner_2: (i64, i64)) -> Vec<(i64, i64)> {
+    Vec::from([
         corner_1,
         (corner_1.0, corner_2.1),
         corner_2,
         (corner_2.0, corner_1.1),
-    ]);
-    get_border(&corners)
+    ])
+}
+
+fn square_border(corner_1: (i64, i64), corner_2: (i64, i64)) -> HashSet<(i64, i64)> {
+    get_border(&square_vertices(corner_1, corner_2))
 }
 
 fn fill_outside(
@@ -165,6 +168,8 @@ pub fn part_two(input: &str) -> Option<i64> {
     let areas = pair_areas(&coordinates);
     let sorted_pairs = sort_pairs(&areas);
     for (index_1, index_2) in sorted_pairs {
+        let vertices = square_vertices(small_coordinates[index_1], small_coordinates[index_2]);
+        if vertices.into_iter().any(|vertex| outside.contains(&vertex)) {continue;}
         if square_border(small_coordinates[index_1], small_coordinates[index_2]).is_disjoint(&outside) {
             return Some(rectangle_area(&coordinates[index_1], &coordinates[index_2]))
         }
