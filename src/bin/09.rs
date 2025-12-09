@@ -162,15 +162,14 @@ pub fn part_two(input: &str) -> Option<i64> {
     let min_y = small_coordinates.iter().map(|(_, y)| y).min().unwrap() - 1;
     let max_y = small_coordinates.iter().map(|(_, y)| y).max().unwrap() + 1;
     let outside = fill_outside(&border, min_x, max_x, min_y, max_y);
-    let pairs = get_pairs(coordinates.len());
-    pairs
-        .iter()
-        .filter(|(index_1, index_2)| {
-            square_border(small_coordinates[*index_1], small_coordinates[*index_2])
-                .is_disjoint(&outside)
-        })
-        .map(|(index_1, index_2)| rectangle_area(&coordinates[*index_1], &coordinates[*index_2]))
-        .max()
+    let areas = pair_areas(&coordinates);
+    let sorted_pairs = sort_pairs(&areas);
+    for (index_1, index_2) in sorted_pairs {
+        if square_border(small_coordinates[index_1], small_coordinates[index_2]).is_disjoint(&outside) {
+            return Some(rectangle_area(&coordinates[index_1], &coordinates[index_2]))
+        }
+    }
+    None
 }
 
 #[cfg(test)]
