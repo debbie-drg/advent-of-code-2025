@@ -169,6 +169,7 @@ pub fn part_two(input: &str) -> Option<i64> {
     let sorted_pairs = sort_pairs(&areas);
     for (index_1, index_2) in sorted_pairs {
         let vertices = square_vertices(small_coordinates[index_1], small_coordinates[index_2]);
+        // this next check reduces runtime massively
         if vertices.into_iter().any(|vertex| outside.contains(&vertex)) {continue;}
         if square_border(small_coordinates[index_1], small_coordinates[index_2]).is_disjoint(&outside) {
             return Some(rectangle_area(&coordinates[index_1], &coordinates[index_2]))
