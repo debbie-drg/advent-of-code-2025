@@ -135,12 +135,12 @@ fn compressed_coordinates(coordinates: &Vec<(i64, i64)>) -> Vec<(i64, i64)> {
     let mut all_x: Vec<&i64> = coordinates.iter().map(|(x, _)| x).unique().collect();
     all_x.sort();
     for (index, value) in all_x.iter().enumerate() {
-        x_coordinates.insert(*value, index as i64);
+        x_coordinates.insert(*value, 2 * index as i64);
     }
     let mut all_y: Vec<&i64> = coordinates.iter().map(|(_, y)| y).unique().collect();
     all_y.sort();
     for (index, value) in all_y.iter().enumerate() {
-        y_coordinates.insert(*value, index as i64);
+        y_coordinates.insert(*value, 2 * index as i64);
     }
     coordinates
         .iter()
