@@ -94,39 +94,38 @@ fn square_border(corner_1: (i64, i64), corner_2: (i64, i64)) -> HashSet<(i64, i6
     get_border(&square_vertices(corner_1, corner_2))
 }
 
-fn fill_outside(
+fn fill_inside(
     border: &HashSet<(i64, i64)>,
-    min_x: i64,
-    max_x: i64,
-    min_y: i64,
-    max_y: i64,
 ) -> HashSet<(i64, i64)> {
-    let mut outside = HashSet::new();
-    let mut queue = Vec::from([(min_x, min_y)]);
+    let mut inside = HashSet::new();
+    let mut x_index = 1;
+    let max_y = border.iter().map(|(_, y)| y).max().unwrap();
+    let mut queue = Vec::new();
+    loop {
+        for y_index in 1..*max_y {
+            if border.contains(&(x_index, &y_index - 1)) {
+                if !border.contains(&(x_index, y_index)) {
+                    queue.push((x_index, y_index));
+                }
+                break;
+            }
+        }
+        if queue.len() > 0 {break;}
+        x_index += 1
+    }
     while queue.len() > 0 {
         let (x, y) = queue.pop().unwrap();
-        let mut next_points = Vec::new();
-        if x + 1 <= max_x {
-            next_points.push((x + 1, y));
-        }
-        if y + 1 <= max_y {
-            next_points.push((x, y + 1));
-        }
-        if x - 1 >= min_x {
-            next_points.push((x - 1, y));
-        }
-        if y - 1 >= min_y {
-            next_points.push((x, y - 1));
-        }
+        let next_points = Vec::from([(x + 1, y), (x, y + 1), (x - 1, y), (x, y - 1)]);
         for point in next_points {
             if !border.contains(&point) {
-                if outside.insert(point) {
+                if inside.insert(point) {
                     queue.push(point)
                 }
             }
         }
     }
-    outside
+    inside.extend(border);
+    inside
 }
 
 fn compressed_coordinates(coordinates: &Vec<(i64, i64)>) -> Vec<(i64, i64)> {
@@ -160,18 +159,14 @@ pub fn part_two(input: &str) -> Option<i64> {
     let coordinates = parse_coordinates(input);
     let small_coordinates = compressed_coordinates(&coordinates);
     let border = get_border(&small_coordinates);
-    let min_x = small_coordinates.iter().map(|(x, _)| x).min().unwrap() - 1;
-    let max_x = small_coordinates.iter().map(|(x, _)| x).max().unwrap() + 1;
-    let min_y = small_coordinates.iter().map(|(_, y)| y).min().unwrap() - 1;
-    let max_y = small_coordinates.iter().map(|(_, y)| y).max().unwrap() + 1;
-    let outside = fill_outside(&border, min_x, max_x, min_y, max_y);
+    let inside = fill_inside(&border);
     let areas = pair_areas(&coordinates);
     let sorted_pairs = sort_pairs(&areas);
     for (index_1, index_2) in sorted_pairs {
         let vertices = square_vertices(small_coordinates[index_1], small_coordinates[index_2]);
         // this next check reduces runtime massively
-        if vertices.into_iter().any(|vertex| outside.contains(&vertex)) {continue;}
-        if square_border(small_coordinates[index_1], small_coordinates[index_2]).is_disjoint(&outside) {
+        if !vertices.into_iter().all(|vertex| inside.contains(&vertex)) {continue;}
+        if inside.is_superset(&square_border(small_coordinates[index_1], small_coordinates[index_2])) {
             return Some(rectangle_area(&coordinates[index_1], &coordinates[index_2]))
         }
     }
