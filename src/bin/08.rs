@@ -6,7 +6,7 @@ advent_of_code::solution!(8);
 fn parse_coordinates(input: &str) -> Vec<Vec<i64>> {
     input
         .split("\n")
-        .filter(|line| line.len() > 0)
+        .filter(|line: &&str| line.len() > 0)
         .map(|line| {
             line.split(",")
                 .map(|value| Some(value.parse().ok()?))

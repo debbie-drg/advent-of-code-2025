@@ -6,7 +6,6 @@ use std::collections::{HashMap, HashSet};
 fn parse_coordinates(input: &str) -> Vec<(i64, i64)> {
     input
         .split("\n")
-        .filter(|line| line.len() > 0)
         .map(|line| {
             let mut split_line = line.split(",");
             let value_1 = split_line.next()?.parse().ok()?;

@@ -81,7 +81,6 @@ fn parse_machine(input: &str) -> Option<(BooleanVector, Vec<BooleanVector>, Vec<
 fn parse_machines(input: &str) -> Vec<(BooleanVector, Vec<BooleanVector>, Vec<u64>)> {
     input
         .split("\n")
-        .filter(|line| line.len() > 0)
         .map(|line| parse_machine(line))
         .filter_map(|x| x)
         .collect()

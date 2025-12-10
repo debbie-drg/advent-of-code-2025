@@ -18,7 +18,6 @@ fn parse_fresh_intervals(input: &str) -> Option<(Vec<(u64, u64)>, Vec<u64>)> {
         .collect();
     let ingredient_list = ingredients
         .split("\n")
-        .filter(|s| s.len() > 0)
         .map(|ingredient| Some(ingredient.parse::<u64>().ok()?))
         .filter_map(|x| x)
         .collect();
