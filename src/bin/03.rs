@@ -11,9 +11,9 @@ fn parse_string_to_numbers(input: &str) -> Vec<u64> {
 
 fn parse_input(input: &str) -> Vec<Vec<u64>> {
     input
+        .trim()
         .split("\n")
         .into_iter()
-        .filter(|line| line.len() > 0)
         .map(|line| parse_string_to_numbers(line))
         .collect()
 }

@@ -4,8 +4,8 @@ advent_of_code::solution!(2);
 
 fn parse_ranges(input: &str) -> Vec<(u64, u64)> {
     input
+        .trim()
         .split(',')
-        .filter_map(|s| Some(s))
         .map(|range| {
             let mut parts = range.split('-');
             let start = parts.next().unwrap().parse::<u64>().unwrap();

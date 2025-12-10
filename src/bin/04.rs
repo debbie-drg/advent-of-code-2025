@@ -23,9 +23,9 @@ fn neighbours(position: (i64, i64)) -> Vec<(i64, i64)> {
 fn roll_positions(input: &str) -> HashSet<(i64, i64)> {
     let mut positions = HashSet::new();
     let split_input: Vec<&str> = input
+        .trim()
         .split("\n")
         .into_iter()
-        .filter(|line| line.len() > 0)
         .collect();
     for (row, line) in split_input.iter().enumerate() {
         for (col, ch) in line.chars().enumerate() {
