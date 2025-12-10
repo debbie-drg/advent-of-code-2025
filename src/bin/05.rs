@@ -1,28 +1,28 @@
 advent_of_code::solution!(5);
 
-use std::{
-    cmp::{max, min},
-};
+use std::cmp::{max, min};
 
-fn parse_fresh_intervals(input: &str) -> (Vec<(u64, u64)>, Vec<u64>) {
+fn parse_fresh_intervals(input: &str) -> Option<(Vec<(u64, u64)>, Vec<u64>)> {
     let mut split_ingredients = input.trim().split("\n\n");
-    let fresh_intervals = split_ingredients.next().unwrap();
-    let ingredients = split_ingredients.next().unwrap();
+    let fresh_intervals = split_ingredients.next()?;
+    let ingredients = split_ingredients.next()?;
     let ingredient_intervals: Vec<(u64, u64)> = fresh_intervals
         .split("\n")
         .map(|range| {
             let mut parts = range.split('-');
-            let start = parts.next().unwrap().parse::<u64>().unwrap();
-            let end = parts.next().unwrap().parse::<u64>().unwrap();
-            (start, end)
+            let start = parts.next()?.parse::<u64>().ok()?;
+            let end = parts.next()?.parse::<u64>().ok()?;
+            Some((start, end))
         })
+        .filter_map(|x| x)
         .collect();
     let ingredient_list = ingredients
         .split("\n")
         .filter(|s| s.len() > 0)
-        .map(|ingredient| ingredient.parse::<u64>().unwrap())
+        .map(|ingredient| Some(ingredient.parse::<u64>().ok()?))
+        .filter_map(|x| x)
         .collect();
-    (ingredient_intervals, ingredient_list)
+    Some((ingredient_intervals, ingredient_list))
 }
 
 fn in_interval(ingredient: u64, fresh_interval: &(u64, u64)) -> bool {
@@ -59,7 +59,7 @@ fn merge_intervals(mut intervals: Vec<(u64, u64)>) -> Vec<(u64, u64)> {
 }
 
 pub fn part_one(input: &str) -> Option<u64> {
-    let (mut ingredient_intervals, ingredients) = parse_fresh_intervals(input);
+    let (mut ingredient_intervals, ingredients) = parse_fresh_intervals(input)?;
     ingredient_intervals = merge_intervals(ingredient_intervals);
     Some(
         ingredients
@@ -75,7 +75,7 @@ pub fn part_one(input: &str) -> Option<u64> {
 }
 
 pub fn part_two(input: &str) -> Option<u64> {
-    let (mut ingredient_intervals, _) = parse_fresh_intervals(input);
+    let (mut ingredient_intervals, _) = parse_fresh_intervals(input)?;
     ingredient_intervals = merge_intervals(ingredient_intervals);
     Some(
         ingredient_intervals

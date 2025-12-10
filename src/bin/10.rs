@@ -1,6 +1,6 @@
 advent_of_code::solution!(10);
 
-use microlp::{LinearExpr, OptimizationDirection, Problem, ComparisonOp};
+use microlp::{ComparisonOp, LinearExpr, OptimizationDirection, Problem};
 use std::collections::HashSet;
 use std::ops::{BitXor, Index};
 
@@ -33,8 +33,8 @@ impl BooleanVector {
     }
 }
 
-fn parse_machine(input: &str) -> (BooleanVector, Vec<BooleanVector>, Vec<u64>) {
-    let (target, rest) = input.split_once(" ").unwrap();
+fn parse_machine(input: &str) -> Option<(BooleanVector, Vec<BooleanVector>, Vec<u64>)> {
+    let (target, rest) = input.split_once(" ")?;
     let mut target_vec = Vec::new();
     for char in target.chars() {
         match char {
@@ -45,27 +45,28 @@ fn parse_machine(input: &str) -> (BooleanVector, Vec<BooleanVector>, Vec<u64>) {
     }
     let num_buttons = target_vec.len();
     let target_vec = BooleanVector(target_vec);
-    let (buttons, joltajes) = rest.rsplit_once(" ").unwrap();
+    let (buttons, joltajes) = rest.rsplit_once(" ")?;
     let joltages = joltajes
-        .strip_suffix("}")
-        .unwrap()
-        .strip_prefix("{")
-        .unwrap()
+        .strip_suffix("}")?
+        .strip_prefix("{")?
         .split(",")
-        .map(|element| element.parse().unwrap())
+        .map(|element| Some(element.parse().ok()?))
+        .filter_map(|x| x)
         .collect();
     let buttons = buttons
         .split(" ")
         .map(|button| {
-            button
-                .strip_prefix("(")
-                .unwrap()
-                .strip_suffix(")")
-                .unwrap()
-                .split(",")
-                .map(|element| element.parse().unwrap())
-                .collect()
+            Some({
+                button
+                    .strip_prefix("(")?
+                    .strip_suffix(")")?
+                    .split(",")
+                    .map(|element| Some(element.parse().ok()?))
+                    .filter_map(|x| x)
+                    .collect()
+            })
         })
+        .filter_map(|x| x)
         .map(|buttons: Vec<u64>| {
             BooleanVector({
                 (0..num_buttons as u64)
@@ -74,7 +75,7 @@ fn parse_machine(input: &str) -> (BooleanVector, Vec<BooleanVector>, Vec<u64>) {
             })
         })
         .collect();
-    (target_vec, buttons, joltages)
+    Some((target_vec, buttons, joltages))
 }
 
 fn parse_machines(input: &str) -> Vec<(BooleanVector, Vec<BooleanVector>, Vec<u64>)> {
@@ -82,6 +83,7 @@ fn parse_machines(input: &str) -> Vec<(BooleanVector, Vec<BooleanVector>, Vec<u6
         .split("\n")
         .filter(|line| line.len() > 0)
         .map(|line| parse_machine(line))
+        .filter_map(|x| x)
         .collect()
 }
 
@@ -107,7 +109,7 @@ fn times_to_turn_on(machine: &(BooleanVector, Vec<BooleanVector>, Vec<u64>)) -> 
     }
 }
 
-fn times_to_match_joltage(machine: &(BooleanVector, Vec<BooleanVector>, Vec<u64>)) -> u64 {
+fn times_to_match_joltage(machine: &(BooleanVector, Vec<BooleanVector>, Vec<u64>)) -> Option<u64> {
     let (_, buttons, joltage) = machine;
     let mut problem = Problem::new(OptimizationDirection::Minimize);
     let mut vars = Vec::new();
@@ -121,13 +123,9 @@ fn times_to_match_joltage(machine: &(BooleanVector, Vec<BooleanVector>, Vec<u64>
                 equation.add(vars[variable], 1.0);
             }
         }
-        problem.add_constraint(
-            equation,
-            ComparisonOp::Eq,
-            joltage[constraint] as f64,
-        );
+        problem.add_constraint(equation, ComparisonOp::Eq, joltage[constraint] as f64);
     }
-    problem.solve().unwrap().objective().round() as u64
+    Some(problem.solve().ok()?.objective().round() as u64)
 }
 
 pub fn part_one(input: &str) -> Option<u64> {
@@ -146,6 +144,7 @@ pub fn part_two(input: &str) -> Option<u64> {
         machines
             .iter()
             .map(|machine| times_to_match_joltage(machine))
+            .filter_map(|x| x)
             .sum(),
     )
 }

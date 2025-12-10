@@ -9,7 +9,8 @@ fn parse_coordinates(input: &str) -> Vec<Vec<i64>> {
         .filter(|line| line.len() > 0)
         .map(|line| {
             line.split(",")
-                .map(|value| value.parse().unwrap())
+                .map(|value| Some(value.parse().ok()?))
+                .filter_map(|x| x)
                 .collect()
         })
         .collect()

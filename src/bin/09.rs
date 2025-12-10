@@ -9,10 +9,11 @@ fn parse_coordinates(input: &str) -> Vec<(i64, i64)> {
         .filter(|line| line.len() > 0)
         .map(|line| {
             let mut split_line = line.split(",");
-            let value_1 = split_line.next().unwrap().parse().unwrap();
-            let value_2 = split_line.next().unwrap().parse().unwrap();
-            (value_1, value_2)
+            let value_1 = split_line.next()?.parse().ok()?;
+            let value_2 = split_line.next()?.parse().ok()?;
+            Some((value_1, value_2))
         })
+        .filter_map(|x| x)
         .collect()
 }
 
@@ -45,7 +46,7 @@ fn get_pairs(number_elements: usize) -> Vec<(usize, usize)> {
 
 fn sort_pairs(areas: &Vec<Vec<i64>>) -> Vec<(usize, usize)> {
     let mut pairs = get_pairs(areas.len());
-    pairs.sort_by(|&a, &b| areas[b.0][b.1].partial_cmp(&areas[a.0][a.1]).unwrap());
+    pairs.sort_by(|&a, &b| areas[b.0][b.1].partial_cmp(&areas[a.0][a.1]).expect("Areas are not comparable."));
 
     pairs
 }
@@ -94,12 +95,10 @@ fn square_border(corner_1: (i64, i64), corner_2: (i64, i64)) -> HashSet<(i64, i6
     get_border(&square_vertices(corner_1, corner_2))
 }
 
-fn fill_inside(
-    border: &HashSet<(i64, i64)>,
-) -> HashSet<(i64, i64)> {
+fn fill_inside(border: &HashSet<(i64, i64)>) -> Option<HashSet<(i64, i64)>> {
     let mut inside = HashSet::new();
     let mut x_index = 1;
-    let max_y = border.iter().map(|(_, y)| y).max().unwrap();
+    let max_y = border.iter().map(|(_, y)| y).max()?;
     let mut queue = Vec::new();
     loop {
         for y_index in 1..*max_y {
@@ -110,11 +109,13 @@ fn fill_inside(
                 break;
             }
         }
-        if queue.len() > 0 {break;}
+        if queue.len() > 0 {
+            break;
+        }
         x_index += 1
     }
     while queue.len() > 0 {
-        let (x, y) = queue.pop().unwrap();
+        let (x, y) = queue.pop()?;
         let next_points = Vec::from([(x + 1, y), (x, y + 1), (x - 1, y), (x, y - 1)]);
         for point in next_points {
             if !border.contains(&point) {
@@ -125,7 +126,7 @@ fn fill_inside(
         }
     }
     inside.extend(border);
-    inside
+    Some(inside)
 }
 
 fn compressed_coordinates(coordinates: &Vec<(i64, i64)>) -> Vec<(i64, i64)> {
@@ -159,15 +160,20 @@ pub fn part_two(input: &str) -> Option<i64> {
     let coordinates = parse_coordinates(input);
     let small_coordinates = compressed_coordinates(&coordinates);
     let border = get_border(&small_coordinates);
-    let inside = fill_inside(&border);
+    let inside = fill_inside(&border)?;
     let areas = pair_areas(&coordinates);
     let sorted_pairs = sort_pairs(&areas);
     for (index_1, index_2) in sorted_pairs {
         let vertices = square_vertices(small_coordinates[index_1], small_coordinates[index_2]);
         // this next check reduces runtime massively
-        if !vertices.into_iter().all(|vertex| inside.contains(&vertex)) {continue;}
-        if inside.is_superset(&square_border(small_coordinates[index_1], small_coordinates[index_2])) {
-            return Some(rectangle_area(&coordinates[index_1], &coordinates[index_2]))
+        if !vertices.into_iter().all(|vertex| inside.contains(&vertex)) {
+            continue;
+        }
+        if inside.is_superset(&square_border(
+            small_coordinates[index_1],
+            small_coordinates[index_2],
+        )) {
+            return Some(rectangle_area(&coordinates[index_1], &coordinates[index_2]));
         }
     }
     None

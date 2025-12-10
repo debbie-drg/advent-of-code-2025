@@ -2,10 +2,10 @@ use std::iter::zip;
 
 advent_of_code::solution!(6);
 
-fn split_numbers_operands(input: &str) -> (&str, Vec<char>) {
-    let (numbers_text, operands) = input.trim().rsplit_once("\n").unwrap();
+fn split_numbers_operands(input: &str) -> Option<(&str, Vec<char>)> {
+    let (numbers_text, operands) = input.trim().rsplit_once("\n")?;
     let operands = operands.chars().filter(|char| char != &' ').collect();
-    (numbers_text, operands)
+    Some((numbers_text, operands))
 }
 
 fn operate(operand: char, numbers: Vec<u64>) -> u64 {
@@ -37,7 +37,7 @@ where
 }
 
 pub fn part_one(input: &str) -> Option<u64> {
-    let (numbers_text, operands) = split_numbers_operands(input);
+    let (numbers_text, operands) = split_numbers_operands(input)?;
     let parsed_numbers: Vec<Vec<u64>> = transpose(
         numbers_text
             .split("\n")
@@ -45,7 +45,8 @@ pub fn part_one(input: &str) -> Option<u64> {
             .map(|line| {
                 line.trim()
                     .split_whitespace()
-                    .map(|entry| entry.parse::<u64>().unwrap())
+                    .map(|entry| Some(entry.parse::<u64>().ok()?))
+                    .filter_map(|x| x)
                     .collect()
             })
             .collect(),
@@ -54,7 +55,7 @@ pub fn part_one(input: &str) -> Option<u64> {
 }
 
 pub fn part_two(input: &str) -> Option<u64> {
-    let (numbers_text, operands) = split_numbers_operands(input);
+    let (numbers_text, operands) = split_numbers_operands(input)?;
     let split_numbers: Vec<Vec<char>> = transpose(
         numbers_text
             .split("\n")
