@@ -1,5 +1,6 @@
 advent_of_code::solution!(10);
 
+use microlp::{LinearExpr, OptimizationDirection, Problem};
 use std::collections::HashSet;
 use std::ops::{BitXor, Index};
 
@@ -106,52 +107,47 @@ fn times_to_turn_on(machine: &(BooleanVector, Vec<BooleanVector>, Vec<u64>)) -> 
     }
 }
 
-fn button_press(button: &BooleanVector, sums: &Vec<u64>) -> Vec<u64> {
-    assert_eq!(button.len(), sums.len());
-    sums.iter().enumerate().map(|(index, element)| match button[index] {
-        true => element + 1,
-        false => *element,
-    }).collect()
-}
-
-fn too_large(sums: &Vec<u64>, goal: &Vec<u64>) -> bool {
-    assert_eq!(sums.len(), goal.len());
-    sums.iter().enumerate().any(|(index, element)| element > &goal[index])
-}
-
 fn times_to_match_joltage(machine: &(BooleanVector, Vec<BooleanVector>, Vec<u64>)) -> u64 {
     let (_, buttons, joltage) = machine;
-    let number_buttons = joltage.len();
-    let mut count = 0;
-    let mut states: HashSet<Vec<u64>> = HashSet::new();
-    states.insert(vec![0; number_buttons]);
-    let mut next_states = HashSet::new();
-    loop {
-        count += 1;
-        for state in states {
-            for button in buttons.clone() {
-                let next_state = button_press(&button, &state);
-                if &next_state == joltage {
-                    return count;
-                }
-                if !too_large(&next_state, joltage) {
-                    next_states.insert(next_state);
-                }
+    let mut problem = Problem::new(OptimizationDirection::Minimize);
+    let mut vars = Vec::new();
+    for _ in 0..buttons.len() {
+        vars.push(problem.add_integer_var(1.0, (0, i32::MAX)));
+    }
+    for constraint in 0..joltage.len() {
+        let mut equation = LinearExpr::empty();
+        for variable in 0..buttons.len() {
+            if buttons[variable][constraint] {
+                equation.add(vars[variable], 1.0);
             }
         }
-        states = next_states;
-        next_states = HashSet::new();
+        problem.add_constraint(
+            equation,
+            microlp::ComparisonOp::Eq,
+            joltage[constraint] as f64,
+        );
     }
+    problem.solve().unwrap().objective().round() as u64
 }
 
 pub fn part_one(input: &str) -> Option<u64> {
     let machines = parse_machines(input);
-    Some(machines.iter().map(|machine| times_to_turn_on(machine)).sum())
+    Some(
+        machines
+            .iter()
+            .map(|machine| times_to_turn_on(machine))
+            .sum(),
+    )
 }
 
 pub fn part_two(input: &str) -> Option<u64> {
     let machines = parse_machines(input);
-    Some(machines.iter().map(|machine| times_to_match_joltage(machine)).sum())
+    Some(
+        machines
+            .iter()
+            .map(|machine| times_to_match_joltage(machine))
+            .sum(),
+    )
 }
 
 #[cfg(test)]
