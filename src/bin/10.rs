@@ -1,6 +1,6 @@
 advent_of_code::solution!(10);
 
-use microlp::{LinearExpr, OptimizationDirection, Problem};
+use microlp::{LinearExpr, OptimizationDirection, Problem, ComparisonOp};
 use std::collections::HashSet;
 use std::ops::{BitXor, Index};
 
@@ -123,7 +123,7 @@ fn times_to_match_joltage(machine: &(BooleanVector, Vec<BooleanVector>, Vec<u64>
         }
         problem.add_constraint(
             equation,
-            microlp::ComparisonOp::Eq,
+            ComparisonOp::Eq,
             joltage[constraint] as f64,
         );
     }
