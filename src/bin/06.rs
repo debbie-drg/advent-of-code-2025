@@ -18,7 +18,6 @@ fn operate(operand: char, numbers: Vec<u64>) -> u64 {
 
 fn operate_all(operands: Vec<char>, numbers_list: Vec<Vec<u64>>) -> u64 {
     zip(operands, numbers_list)
-        .into_iter()
         .map(|(operand, numbers)| operate(operand, numbers))
         .sum()
 }
@@ -41,12 +40,10 @@ pub fn part_one(input: &str) -> Option<u64> {
     let parsed_numbers: Vec<Vec<u64>> = transpose(
         numbers_text
             .split("\n")
-            .into_iter()
             .map(|line| {
-                line.trim()
+                line
                     .split_whitespace()
-                    .map(|entry| Some(entry.parse::<u64>().ok()?))
-                    .filter_map(|x| x)
+                    .filter_map(|entry| entry.parse::<u64>().ok())
                     .collect()
             })
             .collect(),
@@ -59,7 +56,6 @@ pub fn part_two(input: &str) -> Option<u64> {
     let split_numbers: Vec<Vec<char>> = transpose(
         numbers_text
             .split("\n")
-            .into_iter()
             .map(|line| line.chars().collect())
             .collect(),
     );
