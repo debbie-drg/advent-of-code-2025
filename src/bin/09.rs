@@ -6,13 +6,12 @@ use std::collections::{HashMap, HashSet};
 fn parse_coordinates(input: &str) -> Vec<(i64, i64)> {
     input
         .split("\n")
-        .map(|line| {
+        .filter_map(|line| {
             let mut split_line = line.split(",");
             let value_1 = split_line.next()?.parse().ok()?;
             let value_2 = split_line.next()?.parse().ok()?;
             Some((value_1, value_2))
         })
-        .filter_map(|x| x)
         .collect()
 }
 
@@ -20,7 +19,7 @@ fn rectangle_area(corner_1: &(i64, i64), corner_2: &(i64, i64)) -> i64 {
     ((corner_1.0 - corner_2.0).abs() + 1) * ((corner_1.1 - corner_2.1).abs() + 1)
 }
 
-fn pair_areas(vectors: &Vec<(i64, i64)>) -> Vec<Vec<i64>> {
+fn pair_areas(vectors: &[(i64, i64)]) -> Vec<Vec<i64>> {
     vectors
         .iter()
         .map(|vector_1| {
@@ -43,9 +42,13 @@ fn get_pairs(number_elements: usize) -> Vec<(usize, usize)> {
     pairs
 }
 
-fn sort_pairs(areas: &Vec<Vec<i64>>) -> Vec<(usize, usize)> {
+fn sort_pairs(areas: &[Vec<i64>]) -> Vec<(usize, usize)> {
     let mut pairs = get_pairs(areas.len());
-    pairs.sort_by(|&a, &b| areas[b.0][b.1].partial_cmp(&areas[a.0][a.1]).expect("Areas are not comparable."));
+    pairs.sort_by(|&a, &b| {
+        areas[b.0][b.1]
+            .partial_cmp(&areas[a.0][a.1])
+            .expect("Areas are not comparable.")
+    });
 
     pairs
 }
@@ -70,7 +73,7 @@ fn get_line(point_1: (i64, i64), point_2: (i64, i64)) -> HashSet<(i64, i64)> {
     border
 }
 
-fn get_border(coordinates: &Vec<(i64, i64)>) -> HashSet<(i64, i64)> {
+fn get_border(coordinates: &[(i64, i64)]) -> HashSet<(i64, i64)> {
     let mut border = HashSet::new();
     let total = coordinates.len();
     for index in 0..total {
@@ -108,19 +111,17 @@ fn fill_inside(border: &HashSet<(i64, i64)>) -> Option<HashSet<(i64, i64)>> {
                 break;
             }
         }
-        if queue.len() > 0 {
+        if !queue.is_empty() {
             break;
         }
         x_index += 1
     }
-    while queue.len() > 0 {
+    while !queue.is_empty() {
         let (x, y) = queue.pop()?;
         let next_points = Vec::from([(x + 1, y), (x, y + 1), (x - 1, y), (x, y - 1)]);
         for point in next_points {
-            if !border.contains(&point) {
-                if inside.insert(point) {
-                    queue.push(point)
-                }
+            if !border.contains(&point) && inside.insert(point) {
+                queue.push(point)
             }
         }
     }
@@ -128,7 +129,7 @@ fn fill_inside(border: &HashSet<(i64, i64)>) -> Option<HashSet<(i64, i64)>> {
     Some(inside)
 }
 
-fn compressed_coordinates(coordinates: &Vec<(i64, i64)>) -> Vec<(i64, i64)> {
+fn compressed_coordinates(coordinates: &[(i64, i64)]) -> Vec<(i64, i64)> {
     let mut x_coordinates = HashMap::new();
     let mut y_coordinates = HashMap::new();
     let mut all_x: Vec<&i64> = coordinates.iter().map(|(x, _)| x).unique().collect();
