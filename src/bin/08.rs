@@ -6,17 +6,16 @@ advent_of_code::solution!(8);
 fn parse_coordinates(input: &str) -> Vec<Vec<i64>> {
     input
         .split("\n")
-        .filter(|line: &&str| line.len() > 0)
+        .filter(|line: &&str| !line.is_empty())
         .map(|line| {
             line.split(",")
-                .map(|value| Some(value.parse().ok()?))
-                .filter_map(|x| x)
+                .filter_map(|value| value.parse().ok())
                 .collect()
         })
         .collect()
 }
 
-fn euclidean_distance_sq(vector_1: &Vec<i64>, vector_2: &Vec<i64>) -> i64 {
+fn euclidean_distance_sq(vector_1: &[i64], vector_2: &[i64]) -> i64 {
     let mut result: i64 = 0;
     for index in 0..vector_1.len() {
         let diff = vector_1[index] - vector_2[index];
@@ -25,7 +24,7 @@ fn euclidean_distance_sq(vector_1: &Vec<i64>, vector_2: &Vec<i64>) -> i64 {
     result // no need to compute root for comparisons
 }
 
-fn pair_distances(vectors: &Vec<Vec<i64>>) -> Vec<Vec<i64>> {
+fn pair_distances(vectors: &[Vec<i64>]) -> Vec<Vec<i64>> {
     vectors
         .iter()
         .map(|vector_1| {
@@ -37,7 +36,7 @@ fn pair_distances(vectors: &Vec<Vec<i64>>) -> Vec<Vec<i64>> {
         .collect()
 }
 
-fn sort_pairs(distance_matrix: &Vec<Vec<i64>>) -> Vec<(usize, usize)> {
+fn sort_pairs(distance_matrix: &[Vec<i64>]) -> Vec<(usize, usize)> {
     let number_elements = distance_matrix.len();
 
     let mut pairs: Vec<(usize, usize)> =
@@ -62,7 +61,8 @@ fn connect_circuits(coordinates: Vec<Vec<i64>>, all_connections: bool) -> i64 {
     let number_connections: usize;
     if all_connections {
         number_connections = sorted_pairs.len();
-    } else if coordinates.len() <= 20 { // Special case for the test
+    } else if coordinates.len() <= 20 {
+        // Special case for the test
         number_connections = 10;
     } else {
         number_connections = 1000;
@@ -70,8 +70,8 @@ fn connect_circuits(coordinates: Vec<Vec<i64>>, all_connections: bool) -> i64 {
     let mut circuits: Vec<HashSet<&usize>> = Vec::new();
     for (point_1, point_2) in &sorted_pairs[..number_connections] {
         let mut intersecting: Vec<usize> = Vec::new();
-        for index in 0..circuits.len() {
-            if circuits[index].contains(&point_1) || circuits[index].contains(&point_2) {
+        for (index, circuit) in circuits.iter().enumerate() {
+            if circuit.contains(&point_1) || circuit.contains(&point_2) {
                 intersecting.push(index);
             }
         }
@@ -79,7 +79,8 @@ fn connect_circuits(coordinates: Vec<Vec<i64>>, all_connections: bool) -> i64 {
         for index in intersecting.iter().rev() {
             circuit.extend(&circuits.remove(*index));
         }
-        if circuit.len() == coordinates.len() { // reached part 2 condition
+        if circuit.len() == coordinates.len() {
+            // reached part 2 condition
             return coordinates[*point_1][0] * coordinates[*point_2][0];
         }
         circuits.push(circuit);
