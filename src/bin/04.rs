@@ -22,11 +22,7 @@ fn neighbours(position: (i64, i64)) -> Vec<(i64, i64)> {
 
 fn roll_positions(input: &str) -> HashSet<(i64, i64)> {
     let mut positions = HashSet::new();
-    let split_input: Vec<&str> = input
-        .trim()
-        .split("\n")
-        .into_iter()
-        .collect();
+    let split_input: Vec<&str> = input.trim().split("\n").collect();
     for (row, line) in split_input.iter().enumerate() {
         for (col, ch) in line.chars().enumerate() {
             if ch == '@' {
@@ -57,7 +53,7 @@ fn forklift_accessible(input: &str, remove: bool) -> Option<u64> {
         let accessible_now = accessible_list.len();
         accessible += accessible_now as u64;
         if accessible_now == 0 || !remove {
-            return Some(accessible as u64);
+            return Some(accessible);
         }
         for position in accessible_list {
             rolls_map.remove(&position);
