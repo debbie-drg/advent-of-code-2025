@@ -58,13 +58,16 @@ pub fn part_one(input: &str) -> Option<u64> {
 
 pub fn part_two(input: &str) -> Option<u64> {
     let boxes = parse_nodes(input);
-    let server_fft = count_paths(&boxes, "svr", "fft");
-    let server_dac = count_paths(&boxes, "svr", "dac");
     let dac_fft = count_paths(&boxes, "dac", "fft");
+    if dac_fft != 0 {
+        let svr_dac = count_paths(&boxes, "svr", "dac");
+        let fft_out = count_paths(&boxes, "fft", "out"); 
+        return Some(svr_dac * dac_fft * fft_out);
+    } 
+    let svr_fft = count_paths(&boxes, "svr", "fft");
     let fft_dac = count_paths(&boxes, "fft", "dac");
     let dac_out = count_paths(&boxes, "dac", "out");
-    let fft_out = count_paths(&boxes, "fft", "out");
-    Some(server_fft * fft_dac * dac_out + server_dac * dac_fft * fft_out)
+    Some(svr_fft * fft_dac * dac_out)
 }
 
 #[cfg(test)]
