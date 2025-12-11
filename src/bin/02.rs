@@ -1,35 +1,31 @@
-use std::ops::RangeInclusive;
-
 advent_of_code::solution!(2);
 
 fn parse_ranges(input: &str) -> Vec<(u64, u64)> {
     input
         .trim()
         .split(',')
-        .map(|range| {
+        .filter_map(|range| {
             let mut parts = range.split('-');
             let start = parts.next()?.parse::<u64>().ok()?;
             let end = parts.next()?.parse::<u64>().ok()?;
             Some((start, end))
         })
-        .filter_map(|x| x)
         .collect()
 }
 
 fn is_valid(id: &str, all_lengths: bool) -> bool {
     let as_bytes = id.as_bytes();
     let max_len = as_bytes.len() / 2;
-    let chunk_sizes: RangeInclusive<usize>;
-    if all_lengths {
-        chunk_sizes = 1..=max_len;
+    let chunk_sizes = if all_lengths {
+        1..=max_len
     } else {
-        if as_bytes.len() % 2 != 0 {
+        if !as_bytes.len().is_multiple_of(2) {
             return false;
         };
-        chunk_sizes = max_len..=max_len;
-    }
+        max_len..=max_len
+    };
     for chunk_size in chunk_sizes {
-        if as_bytes.len() % chunk_size == 0 {
+        if as_bytes.len().is_multiple_of(chunk_size) {
             let first = &as_bytes[..chunk_size];
             if as_bytes.chunks(chunk_size).all(|chunk| chunk == first) {
                 return true;
