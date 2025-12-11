@@ -12,9 +12,7 @@ fn parse_all_instructions(input: &str) -> Vec<(char, i64)> {
     let input_lines: std::str::Split<'_, &str> = input.trim().split("\n");
     input_lines
         .into_iter()
-        .map(|instruction| parse_instruction(instruction))
-        .into_iter()
-        .filter_map(|x| x)
+        .filter_map(parse_instruction)
         .collect()
 }
 
