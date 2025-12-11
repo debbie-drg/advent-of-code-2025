@@ -50,23 +50,20 @@ fn parse_machine(input: &str) -> Option<(BooleanVector, Vec<BooleanVector>, Vec<
         .strip_suffix("}")?
         .strip_prefix("{")?
         .split(",")
-        .map(|element| Some(element.parse().ok()?))
-        .filter_map(|x| x)
+        .filter_map(|element| element.parse().ok())
         .collect();
     let buttons = buttons
         .split(" ")
-        .map(|button| {
+        .filter_map(|button| {
             Some({
                 button
                     .strip_prefix("(")?
                     .strip_suffix(")")?
                     .split(",")
-                    .map(|element| Some(element.parse().ok()?))
-                    .filter_map(|x| x)
+                    .filter_map(|element| element.parse().ok())
                     .collect()
             })
         })
-        .filter_map(|x| x)
         .map(|buttons: Vec<u64>| {
             BooleanVector({
                 (0..num_buttons as u64)
@@ -79,11 +76,7 @@ fn parse_machine(input: &str) -> Option<(BooleanVector, Vec<BooleanVector>, Vec<
 }
 
 fn parse_machines(input: &str) -> Vec<(BooleanVector, Vec<BooleanVector>, Vec<u64>)> {
-    input
-        .split("\n")
-        .map(|line| parse_machine(line))
-        .filter_map(|x| x)
-        .collect()
+    input.split("\n").filter_map(parse_machine).collect()
 }
 
 fn times_to_turn_on(machine: &(BooleanVector, Vec<BooleanVector>, Vec<u64>)) -> u64 {
@@ -129,23 +122,12 @@ fn times_to_match_joltage(machine: &(BooleanVector, Vec<BooleanVector>, Vec<u64>
 
 pub fn part_one(input: &str) -> Option<u64> {
     let machines = parse_machines(input);
-    Some(
-        machines
-            .iter()
-            .map(|machine| times_to_turn_on(machine))
-            .sum(),
-    )
+    Some(machines.iter().map(times_to_turn_on).sum())
 }
 
 pub fn part_two(input: &str) -> Option<u64> {
     let machines = parse_machines(input);
-    Some(
-        machines
-            .iter()
-            .map(|machine| times_to_match_joltage(machine))
-            .filter_map(|x| x)
-            .sum(),
-    )
+    Some(machines.iter().filter_map(times_to_match_joltage).sum())
 }
 
 #[cfg(test)]
