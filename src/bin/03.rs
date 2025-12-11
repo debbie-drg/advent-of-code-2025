@@ -4,8 +4,11 @@ advent_of_code::solution!(3);
 fn parse_string_to_numbers(input: &str) -> Vec<u64> {
     input
         .chars()
-        .into_iter()
-        .map(|char| char.to_string().parse::<u64>().expect("Failed to parse integer"))
+        .map(|char| {
+            char.to_string()
+                .parse::<u64>()
+                .expect("Failed to parse integer")
+        })
         .collect()
 }
 
@@ -13,12 +16,11 @@ fn parse_input(input: &str) -> Vec<Vec<u64>> {
     input
         .trim()
         .split("\n")
-        .into_iter()
-        .map(|line| parse_string_to_numbers(line))
+        .map(parse_string_to_numbers)
         .collect()
 }
 
-fn compute_max_joltage(input: &Vec<u64>, length: usize) -> Option<u64> {
+fn compute_max_joltage(input: &[u64], length: usize) -> Option<u64> {
     let mut joltage: u64 = 0;
     let mut position = 0;
     for digit_counter in (0..length).rev() {
@@ -28,7 +30,7 @@ fn compute_max_joltage(input: &Vec<u64>, length: usize) -> Option<u64> {
             .min_by_key(|&(_, value)| Reverse(value))?;
 
         position += max_position + 1;
-        joltage += (10 as u64).pow(digit_counter as u32) * max_value;
+        joltage += (10_u64).pow(digit_counter as u32) * max_value;
     }
     Some(joltage)
 }
