@@ -6,18 +6,14 @@ fn parse_node(input: &str) -> Option<(String, Vec<String>)> {
     let (name, children) = input.split_once(":")?;
     let children = children
         .split(" ")
-        .filter(|name| name.len() > 0)
+        .filter(|name| !name.is_empty())
         .map(|name| name.to_owned())
         .collect();
     Some((name.to_owned(), children))
 }
 
 fn parse_nodes(input: &str) -> HashMap<String, Vec<String>> {
-    input
-        .split("\n")
-        .map(|line| parse_node(line))
-        .filter_map(|x| x)
-        .collect()
+    input.split("\n").filter_map(parse_node).collect()
 }
 
 fn count_paths(
@@ -26,7 +22,7 @@ fn count_paths(
     end_position: &str,
 ) -> u64 {
     let mut counts = HashMap::new();
-    count_paths_recursor(&boxes, start_position.to_owned(), end_position, &mut counts)
+    count_paths_recursor(boxes, start_position.to_owned(), end_position, &mut counts)
 }
 
 fn count_paths_recursor(
@@ -39,12 +35,10 @@ fn count_paths_recursor(
     for child in boxes[&current_position].clone() {
         if counts.contains_key(&child) {
             result += counts[&child];
-        } else {
-            if &child == end_position {
-                result += 1;
-            } else if boxes.contains_key(&child) {
-                result += count_paths_recursor(boxes, child, end_position, counts)
-            }
+        } else if child == end_position {
+            result += 1;
+        } else if boxes.contains_key(&child) {
+            result += count_paths_recursor(boxes, child, end_position, counts)
         }
     }
     counts.insert(current_position, result);
@@ -66,9 +60,9 @@ pub fn part_two(input: &str) -> Option<u64> {
         let dac_out = count_paths(&boxes, "dac", "out");
 
         return Some(svr_fft * fft_dac * dac_out);
-    } 
+    }
     let svr_dac = count_paths(&boxes, "svr", "dac");
-    let fft_out = count_paths(&boxes, "fft", "out"); 
+    let fft_out = count_paths(&boxes, "fft", "out");
     Some(svr_dac * dac_fft * fft_out)
 }
 
