@@ -2,26 +2,24 @@ advent_of_code::solution!(5);
 
 use std::cmp::{max, min};
 
-fn parse_fresh_intervals(input: &str) -> Option<(Vec<(u64, u64)>, Vec<u64>)> {
+fn parse_fresh_intervals(input: &str) -> (Vec<(u64, u64)>, Vec<u64>) {
     let mut split_ingredients = input.trim().split("\n\n");
-    let fresh_intervals = split_ingredients.next()?;
-    let ingredients = split_ingredients.next()?;
+    let fresh_intervals = split_ingredients.next().expect("Is the input file correct?");
+    let ingredients = split_ingredients.next().expect("Is the inpuct file correct?");
     let ingredient_intervals: Vec<(u64, u64)> = fresh_intervals
         .split("\n")
-        .map(|range| {
+        .filter_map(|range| {
             let mut parts = range.split('-');
             let start = parts.next()?.parse::<u64>().ok()?;
             let end = parts.next()?.parse::<u64>().ok()?;
             Some((start, end))
         })
-        .filter_map(|x| x)
         .collect();
     let ingredient_list = ingredients
         .split("\n")
-        .map(|ingredient| Some(ingredient.parse::<u64>().ok()?))
-        .filter_map(|x| x)
+        .filter_map(|ingredient| ingredient.parse::<u64>().ok())
         .collect();
-    Some((ingredient_intervals, ingredient_list))
+    (ingredient_intervals, ingredient_list)
 }
 
 fn in_interval(ingredient: u64, fresh_interval: &(u64, u64)) -> bool {
@@ -58,7 +56,7 @@ fn merge_intervals(mut intervals: Vec<(u64, u64)>) -> Vec<(u64, u64)> {
 }
 
 pub fn part_one(input: &str) -> Option<u64> {
-    let (mut ingredient_intervals, ingredients) = parse_fresh_intervals(input)?;
+    let (mut ingredient_intervals, ingredients) = parse_fresh_intervals(input);
     ingredient_intervals = merge_intervals(ingredient_intervals);
     Some(
         ingredients
@@ -66,7 +64,7 @@ pub fn part_one(input: &str) -> Option<u64> {
             .map(|ingredient| {
                 ingredient_intervals
                     .iter()
-                    .any(|interval| in_interval(ingredient, &interval))
+                    .any(|interval| in_interval(ingredient, interval))
             })
             .filter(|fresh| *fresh)
             .count() as u64,
@@ -74,7 +72,7 @@ pub fn part_one(input: &str) -> Option<u64> {
 }
 
 pub fn part_two(input: &str) -> Option<u64> {
-    let (mut ingredient_intervals, _) = parse_fresh_intervals(input)?;
+    let (mut ingredient_intervals, _) = parse_fresh_intervals(input);
     ingredient_intervals = merge_intervals(ingredient_intervals);
     Some(
         ingredient_intervals
