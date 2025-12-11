@@ -4,8 +4,12 @@ use std::cmp::{max, min};
 
 fn parse_fresh_intervals(input: &str) -> (Vec<(u64, u64)>, Vec<u64>) {
     let mut split_ingredients = input.trim().split("\n\n");
-    let fresh_intervals = split_ingredients.next().expect("Is the input file correct?");
-    let ingredients = split_ingredients.next().expect("Is the inpuct file correct?");
+    let fresh_intervals = split_ingredients
+        .next()
+        .expect("Is the input file correct?");
+    let ingredients = split_ingredients
+        .next()
+        .expect("Is the inpuct file correct?");
     let ingredient_intervals: Vec<(u64, u64)> = fresh_intervals
         .split("\n")
         .filter_map(|range| {

@@ -41,8 +41,7 @@ pub fn part_one(input: &str) -> Option<u64> {
         numbers_text
             .split("\n")
             .map(|line| {
-                line
-                    .split_whitespace()
+                line.split_whitespace()
                     .filter_map(|entry| entry.parse::<u64>().ok())
                     .collect()
             })
