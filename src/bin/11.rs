@@ -26,9 +26,6 @@ fn count_paths(
     end_position: &str,
 ) -> u64 {
     let mut counts = HashMap::new();
-    if end_position != "out" {
-        counts.insert("out".to_owned(), 0);
-    }
     count_paths_recursor(&boxes, start_position.to_owned(), end_position, &mut counts)
 }
 
@@ -45,7 +42,7 @@ fn count_paths_recursor(
         } else {
             if &child == end_position {
                 result += 1;
-            } else {
+            } else if boxes.contains_key(&child) {
                 result += count_paths_recursor(boxes, child, end_position, counts)
             }
         }
