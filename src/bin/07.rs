@@ -5,7 +5,7 @@ use std::collections::{HashMap, HashSet};
 fn parse_manifold(input: &str) -> (HashSet<(i64, i64)>, (i64, i64)) {
     let mut splitters = HashSet::new();
     let mut start: (i64, i64) = (0, 0);
-    let split_input: Vec<&str> = input.trim().split("\n").into_iter().collect();
+    let split_input: Vec<&str> = input.trim().split("\n").collect();
     for (row, line) in split_input
         .iter()
         .enumerate()
@@ -31,7 +31,7 @@ fn beam_count(splitters: &HashSet<(i64, i64)>, start_position: (i64, i64)) -> (i
     current_beams.insert(start_position.1, 1);
     let mut next_beams: HashMap<i64, i64> = HashMap::new();
     for row in (0..start_position.0).rev() {
-        for (col, beam_count) in current_beams.iter().into_iter() {
+        for (col, beam_count) in current_beams.iter() {
             let offsets: Vec<i64>;
             if splitters.contains(&(row, *col)) {
                 offsets = vec![-1, 1];
@@ -50,11 +50,7 @@ fn beam_count(splitters: &HashSet<(i64, i64)>, start_position: (i64, i64)) -> (i
         next_beams = HashMap::new();
     }
     let splitter_count = used_splitters.len() as i64;
-    let beam_count = current_beams
-        .iter()
-        .into_iter()
-        .map(|(_, value)| value)
-        .sum();
+    let beam_count = current_beams.values().sum();
     (splitter_count, beam_count)
 }
 
