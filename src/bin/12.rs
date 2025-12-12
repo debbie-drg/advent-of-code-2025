@@ -8,7 +8,7 @@ fn present_sizes(maps: &str) -> Vec<usize> {
         .collect()
 }
 
-fn parse_region(instruction: &str) -> Option<(usize, Vec<usize>)> {
+fn parse_region(instruction: &str) -> Option<((usize, usize), Vec<usize>)> {
     let (grid, counts) = instruction.split_once(":")?;
     let (number_1, number_2) = grid.split_once("x")?;
     let number_1 = number_1.parse::<usize>().ok()?;
@@ -17,21 +17,24 @@ fn parse_region(instruction: &str) -> Option<(usize, Vec<usize>)> {
         .split(" ")
         .filter_map(|count| count.parse().ok())
         .collect();
-    Some((number_1 * number_2, counts))
+    Some(((number_1, number_2), counts))
 }
 
-fn is_region_valid(sizes: &[usize], region: &(usize, Vec<usize>)) -> bool {
-    let (total_size, number_presents) = region;
+fn is_region_valid(sizes: &[usize], region: &((usize, usize), Vec<usize>)) -> bool {
+    let ((depth, width), number_presents) = region;
     let total_count: usize = zip(sizes, number_presents)
         .map(|(size, number)| size * number)
         .sum();
-    total_count <= *total_size
+    if total_count > depth * width {return false;}
+    let number_squares = (depth / 3) * (width / 3);
+    if number_squares >= number_presents.iter().sum() {return true;}
+    panic!("Packing algorithm not implemented!")
 }
 
 pub fn part_one(input: &str) -> Option<u64> {
     let (maps, instructions) = input.rsplit_once("\n\n")?;
     let sizes = present_sizes(maps);
-    let regions: Vec<(usize, Vec<usize>)> =
+    let regions: Vec<((usize, usize), Vec<usize>)> =
         instructions.split("\n").filter_map(parse_region).collect();
     Some(
         regions
